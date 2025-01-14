@@ -1,0 +1,13 @@
+File 'active_object.cpp'
+Lines executed:0.00% of 9
+Creating 'active_object.cpp.gcov'
+
+File '/usr/include/c++/11/iostream'
+No executable lines
+Removing 'iostream.gcov'
+
+File '/usr/include/c++/11/bits/std_function.h'
+Lines executed:0.00% of 5
+Creating 'std_function.h.gcov'
+
+Lines executed:0.00% of 14

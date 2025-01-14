@@ -1,0 +1,104 @@
+        -:    0:Source:active_object.cpp
+        -:    0:Graph:active_object.gcno
+        -:    0:Data:active_object.gcda
+        -:    0:Runs:1
+        -:    1:#include "active_object.hpp"
+        -:    2:#include <iostream>
+        -:    3:
+        -:    4:// Since most implementation is in the header file as it's a template class,
+        -:    5:// we'll implement some utility functions and error handling here
+        -:    6:
+        -:    7:class ActiveObjectException : public std::runtime_error {
+        -:    8:public:
+    #####:    9:    explicit ActiveObjectException(const std::string& message)
+    #####:   10:        : std::runtime_error(message) {}
+        -:   11:};
+        -:   12:
+    #####:   13:void handleActiveObjectError(const std::string& error_message) {
+    #####:   14:    throw ActiveObjectException(error_message);
+        -:   15:}
+        -:   16:
+        -:   17:// Helper function to check if a task is valid
+    #####:   18:bool isTaskValid(const std::function<void()>& task) {
+    #####:   19:    return task != nullptr;
+        -:   20:}
+        -:   21:
+        -:   22:// Helper function to log active object events (if logging is enabled)
+    #####:   23:void logActiveObjectEvent(const std::string& event) {
+    #####:   24:    std::cout << "ActiveObject: " << event << std::endl;
+    #####:   25:}
+        -:   26:
+        -:   27:// Error checking wrapper for task execution
+        -:   28:template<typename T>
+        -:   29:T executeTaskSafely(const std::function<T()>& task, const std::string& taskName) {
+        -:   30:    try {
+        -:   31:        if (!isTaskValid(task)) {
+        -:   32:            handleActiveObjectError("Invalid task: " + taskName);
+        -:   33:        }
+        -:   34:        return task();
+        -:   35:    } catch (const std::exception& e) {
+        -:   36:        handleActiveObjectError("Task execution failed: " + std::string(e.what()));
+        -:   37:    }
+        -:   38:    // This return is just to satisfy the compiler, 
+        -:   39:    // the function will throw before reaching here
+        -:   40:    return T();
+        -:   41:}
+        -:   42:
+        -:   43:// Additional utility functions that can be used with ActiveObject
+        -:   44:namespace active_object_utils {
+        -:   45:    
+        -:   46:    // Function to create a delayed task
+        -:   47:    template<typename T>
+        -:   48:    std::function<T()> createDelayedTask(
+        -:   49:        std::function<T()> task, 
+        -:   50:        std::chrono::milliseconds delay
+        -:   51:    ) {
+        -:   52:        return [task, delay]() {
+        -:   53:            std::this_thread::sleep_for(delay);
+        -:   54:            return task();
+        -:   55:        };
+        -:   56:    }
+        -:   57:
+        -:   58:    // Function to create a task with timeout
+        -:   59:    template<typename T>
+        -:   60:    std::function<T()> createTaskWithTimeout(
+        -:   61:        std::function<T()> task, 
+        -:   62:        std::chrono::milliseconds timeout
+        -:   63:    ) {
+        -:   64:        return [task, timeout]() {
+        -:   65:            auto future = std::async(std::launch::async, task);
+        -:   66:            auto status = future.wait_for(timeout);
+        -:   67:            
+        -:   68:            if (status != std::future_status::ready) {
+        -:   69:                handleActiveObjectError("Task timed out");
+        -:   70:            }
+        -:   71:            
+        -:   72:            return future.get();
+        -:   73:        };
+        -:   74:    }
+        -:   75:
+        -:   76:    // Function to create a retrying task
+        -:   77:    template<typename T>
+        -:   78:    std::function<T()> createRetryingTask(
+        -:   79:        std::function<T()> task, 
+        -:   80:        int maxRetries
+        -:   81:    ) {
+        -:   82:        return [task, maxRetries]() {
+        -:   83:            int retries = 0;
+        -:   84:            while (retries < maxRetries) {
+        -:   85:                try {
+        -:   86:                    return task();
+        -:   87:                } catch (const std::exception& e) {
+        -:   88:                    retries++;
+        -:   89:                    if (retries >= maxRetries) {
+        -:   90:                        throw;
+        -:   91:                    }
+        -:   92:                    std::this_thread::sleep_for(
+        -:   93:                        std::chrono::milliseconds(100 * retries)
+        -:   94:                    );
+        -:   95:                }
+        -:   96:            }
+        -:   97:            throw ActiveObjectException("Max retries exceeded");
+        -:   98:        };
+        -:   99:    }
+        -:  100:}
