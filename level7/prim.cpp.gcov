@@ -1,0 +1,84 @@
+        -:    0:Source:prim.cpp
+        -:    0:Graph:prim.gcno
+        -:    0:Data:prim.gcda
+        -:    0:Runs:1
+        -:    1:#include "prim.hpp"
+        -:    2:#include <vector>
+        -:    3:#include <queue>
+        -:    4:#include <tuple>
+        -:    5:#include <iostream>
+        -:    6:#include <limits>
+        -:    7:
+        -:    8:using namespace std;
+        -:    9:
+        1:   10:vector<tuple<int, int, int, int>> prim(const vector<tuple<int, int, int, int>>& edges, int n) {
+       1*:   11:    if (edges.empty() || n == 0) {  
+    #####:   12:        cerr << "Error: No edges provided or empty graph!\n";
+    #####:   13:        return {};
+        -:   14:    }
+        -:   15:
+        -:   16:    // יצירת רשימת שכנים בגודל n (התאמה לאינדקסים מ-1)
+        1:   17:    vector<vector<pair<int, int>>> adj(n);
+        6:   18:    for (const auto& edge : edges) {
+        -:   19:        int a, b, c, id;
+        5:   20:        tie(a, b, c, id) = edge;
+        -:   21:        
+        -:   22:        // התאמה לאינדקסים מ-1 על ידי הפחתת 1 מכל צומת
+        5:   23:        a--; b--;  
+        -:   24:
+        5:   25:        if (a >= n || b >= n || a < 0 || b < 0) {
+    #####:   26:            cerr << "Error: Node index out of bounds: " << a + 1 << ", " << b + 1 << "\n";
+    #####:   27:            return {};
+        -:   28:        }
+        -:   29:
+        5:   30:        adj[a].emplace_back
+        5:   31:(b, c);
+        5:   32:        adj[b].emplace_back(a, c);
+        -:   33:    }
+        -:   34:
+        1:   35:    cout << "Starting Prim's Algorithm with 1-based indexing support...\n";
+        -:   36:
+        1:   37:    vector<bool> visited(n, false);
+        1:   38:    vector<int> minWeight(n, numeric_limits<int>::max());
+        1:   39:    vector<int> parent(n, -1);
+        -:   40:
+        -:   41:    // Priority Queue - משקל ראשון, צומת שני
+        1:   42:    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+        1:   43:    pq.emplace(0, 0);  // התחל מצומת 1 לאחר ההפחתה
+        1:   44:    minWeight[0] = 0;
+        -:   45:
+        1:   46:    vector<tuple<int, int, int, int>> mst;
+        1:   47:    int edges_added = 0;
+        -:   48:
+        -:   49:    // לולאת האלגוריתם הראשית
+        6:   50:    while (!pq.empty() && edges_added < n - 1) {
+        -:   51:        int weight, node;
+        5:   52:        tie(weight, node) = pq.top();
+        5:   53:        pq.pop();
+        -:   54:
+       5*:   55:        if (visited[node]) continue;
+        5:   56:        visited[node] = true;
+        -:   57:
+        5:   58:        if (parent[node] != -1) {
+        4:   59:            mst.emplace_back(parent[node] + 1, node + 1, weight, edges_added);
+        4:   60:            edges_added++;
+        4:   61:            cout << "MST Edge Added: " << parent[node] + 1 << " -> " << node + 1 << " (Weight: " << weight << ")\n";
+        -:   62:        }
+        -:   63:
+       15:   64:        for (const auto& [neighbor, w] : adj[node]) {
+       10:   65:            if (!visited[neighbor] && w < minWeight[neighbor]) {
+        5:   66:                minWeight[neighbor] = w;
+        5:   67:                parent[neighbor] = node;
+        5:   68:                pq.emplace(w, neighbor);
+        -:   69:            }
+        -:   70:        }
+        -:   71:    }
+        -:   72:
+        1:   73:    if (edges_added < n - 1) {
+    #####:   74:        cerr << "Error: Graph is not connected, cannot find MST.\n";
+    #####:   75:        return {};
+        -:   76:    }
+        -:   77:
+        1:   78:    cout << "Prim's Algorithm completed successfully!\n";
+        1:   79:    return mst;
+        1:   80:}

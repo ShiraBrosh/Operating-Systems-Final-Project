@@ -1,0 +1,62 @@
+/*
+==========================================
+          HOW TO RUN
+==========================================
+
+gcov union_find.gcda > union_find_gcov.txt
+*/
+
+
+File '/usr/include/c++/11/bits/stl_algobase.h'
+Lines executed:0.00% of 20
+Creating 'stl_algobase.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator_base_types.h'
+Lines executed:0.00% of 2
+Creating 'stl_iterator_base_types.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_construct.h'
+Lines executed:42.86% of 7
+Creating 'stl_construct.h.gcov'
+
+File '/usr/include/c++/11/ext/new_allocator.h'
+Lines executed:0.00% of 15
+Creating 'new_allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_uninitialized.h'
+Lines executed:63.16% of 19
+Creating 'stl_uninitialized.h.gcov'
+
+File '/usr/include/c++/11/bits/move.h'
+Lines executed:100.00% of 2
+Creating 'move.h.gcov'
+
+File '/usr/include/c++/11/bits/alloc_traits.h'
+Lines executed:0.00% of 9
+Creating 'alloc_traits.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_vector.h'
+Lines executed:20.00% of 60
+Creating 'stl_vector.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator.h'
+Lines executed:100.00% of 11
+Creating 'stl_iterator.h.gcov'
+
+File '/usr/include/c++/11/bits/allocator.h'
+Lines executed:0.00% of 4
+Creating 'allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_numeric.h'
+Lines executed:100.00% of 5
+Creating 'stl_numeric.h.gcov'
+
+File 'union_find.cpp'
+Lines executed:93.75% of 16
+Creating 'union_find.cpp.gcov'
+
+File '/usr/include/c++/11/new'
+Lines executed:0.00% of 2
+Creating 'new.gcov'
+
+Lines executed:34.88% of 172

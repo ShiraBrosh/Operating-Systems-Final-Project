@@ -1,0 +1,35 @@
+/*
+==========================================
+          HOW TO RUN
+==========================================
+
+gcov MSTFactory.gcda > MSTFactory_gcov.txt
+*/
+
+
+
+File 'MSTFactory.cpp'
+Lines executed:77.78% of 9
+Creating 'MSTFactory.cpp.gcov'
+
+File '/usr/include/c++/11/iostream'
+No executable lines
+Removing 'iostream.gcov'
+
+File '/usr/include/c++/11/ext/new_allocator.h'
+Lines executed:0.00% of 1
+Creating 'new_allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_vector.h'
+Lines executed:0.00% of 8
+Creating 'stl_vector.h.gcov'
+
+File '/usr/include/c++/11/bits/allocator.h'
+Lines executed:0.00% of 1
+Creating 'allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/basic_string.h'
+Lines executed:0.00% of 2
+Creating 'basic_string.h.gcov'
+
+Lines executed:33.33% of 21

@@ -1,0 +1,48 @@
+        -:    0:Source:mst_metrics.hpp
+        -:    0:Graph:server.gcno
+        -:    0:Data:server.gcda
+        -:    0:Runs:1
+        -:    1:// mst_metrics.hpp
+        -:    2:#ifndef MST_METRICS_HPP
+        -:    3:#define MST_METRICS_HPP
+        -:    4:
+        -:    5:#include <vector>
+        -:    6:#include <tuple>
+        -:    7:#include <limits>
+        -:    8:#include <stdexcept>
+        -:    9:#include <iostream>
+        -:   10:
+        -:   11:struct MSTResult {
+        -:   12:    std::vector<std::tuple<int, int, int>> mst_edges;
+        -:   13:    double total_weight;
+        -:   14:    double longest_distance;
+        -:   15:    double average_distance;
+        -:   16:    double shortest_distance;
+        -:   17:    
+        -:   18:    // Constructor with default values
+        5:   19:    MSTResult() : 
+        5:   20:        total_weight(0),
+        5:   21:        longest_distance(0),
+        5:   22:        average_distance(0),
+        5:   23:        shortest_distance(std::numeric_limits<double>::infinity()) {}
+        -:   24:};
+        -:   25:
+        -:   26:class MSTMetrics {
+        -:   27:public:
+        -:   28:    // Calculate all metrics for a given MST
+        -:   29:    static MSTResult calculateMetrics(const std::vector<std::tuple<int, int, int>>& mst_edges, int vertex_count);
+        -:   30:    
+        -:   31:    // Individual metric calculations
+        -:   32:    static double calculateTotalWeight(const std::vector<std::tuple<int, int, int>>& mst_edges);
+        -:   33:    static double calculateLongestDistance(const std::vector<std::tuple<int, int, int>>& mst_edges, int vertex_count);
+        -:   34:    static double calculateAverageDistance(const std::vector<std::tuple<int, int, int>>& mst_edges, int vertex_count);
+        -:   35:    static double calculateShortestDistance(const std::vector<std::tuple<int, int, int>>& mst_edges);
+        -:   36:
+        -:   37:private:
+        -:   38:    static std::vector<std::vector<double>> buildDistanceMatrix(
+        -:   39:        const std::vector<std::tuple<int, int, int>>& mst_edges, 
+        -:   40:        int vertex_count
+        -:   41:    );
+        -:   42:};
+        -:   43:
+        -:   44:#endif // MST_METRICS_HPP

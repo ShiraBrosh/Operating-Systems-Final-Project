@@ -1,0 +1,56 @@
+        -:    0:Source:leader_follower.hpp
+        -:    0:Graph:leader_follower.gcno
+        -:    0:Data:leader_follower.gcda
+        -:    0:Runs:1
+        -:    1:// leader_follower.hpp
+        -:    2:#ifndef LEADER_FOLLOWER_HPP
+        -:    3:#define LEADER_FOLLOWER_HPP
+        -:    4:
+        -:    5:#include <vector>
+        -:    6:#include <queue>
+        -:    7:#include <thread>
+        -:    8:#include <mutex>
+        -:    9:#include <condition_variable>
+        -:   10:#include <functional>
+        -:   11:#include <memory>
+        -:   12:#include <atomic>
+        -:   13:#include <iostream>
+        -:   14:
+        -:   15:class LeaderFollowerPool {
+        -:   16:private:
+        -:   17:    struct Worker {
+        -:   18:        std::thread thread;
+        -:   19:        bool is_leader;
+        -:   20:        std::condition_variable cv;
+        -:   21:        std::mutex mutex;
+        -:   22:        bool processing;
+        -:   23:        
+        4:   24:        Worker() : is_leader(false), processing(false) {}
+        -:   25:    };
+        -:   26:
+        -:   27:    std::vector<std::unique_ptr<Worker>> workers;
+        -:   28:    std::queue<std::function<void()>> tasks;
+        -:   29:    mutable std::mutex pool_mutex;
+        -:   30:    std::condition_variable pool_cv;
+        -:   31:    std::atomic<bool> running;
+        -:   32:    std::atomic<int> leader_count;
+        -:   33:    size_t thread_count;
+        -:   34:
+        -:   35:    void worker_loop(Worker* worker);
+        -:   36:    void promote_new_leader();
+        -:   37:
+        -:   38:public:
+        -:   39:    explicit LeaderFollowerPool(size_t num_threads);
+        -:   40:    ~LeaderFollowerPool();
+        -:   41:
+        -:   42:    LeaderFollowerPool(const LeaderFollowerPool&) = delete;
+        -:   43:    LeaderFollowerPool& operator=(const LeaderFollowerPool&) = delete;
+        -:   44:
+        -:   45:    void submit(std::function<void()> task);
+        -:   46:    size_t get_thread_count() const { return thread_count; }
+        -:   47:    size_t get_pending_tasks() const;
+        -:   48:    bool has_active_tasks() const;
+        -:   49:    void shutdown();
+        -:   50:};
+        -:   51:
+        -:   52:#endif // LEADER_FOLLOWER_HPP

@@ -1,0 +1,90 @@
+/*
+==========================================
+          HOW TO RUN
+==========================================
+
+gcov kruskal.gcda > kruskal_gcov.txt
+*/
+
+
+File 'kruskal.cpp'
+Lines executed:90.00% of 20
+Creating 'kruskal.cpp.gcov'
+
+File '/usr/include/c++/11/iostream'
+No executable lines
+Removing 'iostream.gcov'
+
+File '/usr/include/c++/11/tuple'
+Lines executed:54.05% of 74
+Creating 'tuple.gcov'
+
+File '/usr/include/c++/11/bits/move.h'
+Lines executed:36.36% of 11
+Creating 'move.h.gcov'
+
+File '/usr/include/c++/11/ext/new_allocator.h'
+Lines executed:26.32% of 19
+Creating 'new_allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_algobase.h'
+Lines executed:6.06% of 33
+Creating 'stl_algobase.h.gcov'
+
+File '/usr/include/c++/11/bits/predefined_ops.h'
+Lines executed:73.68% of 19
+Creating 'predefined_ops.h.gcov'
+
+File '/usr/include/c++/11/bits/alloc_traits.h'
+Lines executed:58.82% of 17
+Creating 'alloc_traits.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_heap.h'
+Lines executed:0.00% of 48
+Creating 'stl_heap.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_uninitialized.h'
+Lines executed:45.45% of 22
+Creating 'stl_uninitialized.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator.h'
+Lines executed:38.46% of 26
+Creating 'stl_iterator.h.gcov'
+
+File '/usr/include/c++/11/bits/cpp_type_traits.h'
+Lines executed:0.00% of 2
+Creating 'cpp_type_traits.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_vector.h'
+Lines executed:55.70% of 79
+Creating 'stl_vector.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_algo.h'
+Lines executed:32.53% of 83
+Creating 'stl_algo.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_construct.h'
+Lines executed:100.00% of 7
+Creating 'stl_construct.h.gcov'
+
+File '/usr/include/c++/11/bits/allocator.h'
+Lines executed:50.00% of 4
+Creating 'allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/vector.tcc'
+Lines executed:100.00% of 27
+Creating 'vector.tcc.gcov'
+
+File '/usr/include/c++/11/ext/alloc_traits.h'
+Lines executed:100.00% of 2
+Creating 'alloc_traits.h.gcov'
+
+File 'union_find.hpp'
+No executable lines
+Removing 'union_find.hpp.gcov'
+
+File '/usr/include/c++/11/new'
+Lines executed:0.00% of 2
+Creating 'new.gcov'
+
+Lines executed:44.85% of 495

@@ -1,0 +1,103 @@
+/*
+==========================================
+          HOW TO RUN
+==========================================
+
+gcov prim.gcda > prim_gcov.txt
+*/
+
+
+
+File 'prim.cpp'
+Lines executed:86.05% of 43
+Creating 'prim.cpp.gcov'
+
+File '/usr/include/c++/11/iostream'
+No executable lines
+Removing 'iostream.gcov'
+
+File '/usr/include/c++/11/tuple'
+Lines executed:32.69% of 52
+Creating 'tuple.gcov'
+
+File '/usr/include/c++/11/ext/new_allocator.h'
+Lines executed:84.21% of 19
+Creating 'new_allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/move.h'
+Lines executed:100.00% of 6
+Creating 'move.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_algobase.h'
+Lines executed:65.38% of 26
+Creating 'stl_algobase.h.gcov'
+
+File '/usr/include/c++/11/bits/alloc_traits.h'
+Lines executed:100.00% of 15
+Creating 'alloc_traits.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_uninitialized.h'
+Lines executed:100.00% of 29
+Creating 'stl_uninitialized.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_pair.h'
+Lines executed:100.00% of 13
+Creating 'stl_pair.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator_base_types.h'
+Lines executed:100.00% of 2
+Creating 'stl_iterator_base_types.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_construct.h'
+Lines executed:100.00% of 14
+Creating 'stl_construct.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_vector.h'
+Lines executed:89.32% of 103
+Creating 'stl_vector.h.gcov'
+
+File '/usr/include/c++/11/bits/predefined_ops.h'
+Lines executed:80.00% of 10
+Creating 'predefined_ops.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_function.h'
+Lines executed:100.00% of 5
+Creating 'stl_function.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_heap.h'
+Lines executed:81.40% of 43
+Creating 'stl_heap.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator.h'
+Lines executed:100.00% of 22
+Creating 'stl_iterator.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_bvector.h'
+Lines executed:95.24% of 84
+Creating 'stl_bvector.h.gcov'
+
+File '/usr/include/c++/11/bits/allocator.h'
+Lines executed:100.00% of 5
+Creating 'allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/vector.tcc'
+Lines executed:79.41% of 34
+Creating 'vector.tcc.gcov'
+
+File '/usr/include/c++/11/bits/stl_queue.h'
+Lines executed:100.00% of 14
+Creating 'stl_queue.h.gcov'
+
+File '/usr/include/c++/11/utility'
+Lines executed:100.00% of 6
+Creating 'utility.gcov'
+
+File '/usr/include/c++/11/limits'
+Lines executed:100.00% of 1
+Creating 'limits.gcov'
+
+File '/usr/include/c++/11/new'
+Lines executed:0.00% of 2
+Creating 'new.gcov'
+
+Lines executed:84.12% of 548

@@ -1,0 +1,50 @@
+        -:    0:Source:kruskal.cpp
+        -:    0:Graph:kruskal.gcno
+        -:    0:Data:kruskal.gcda
+        -:    0:Runs:1
+        -:    1:// kruskal.cpp
+        -:    2:#include "kruskal.hpp"
+        -:    3:#include "union_find.hpp"
+        -:    4:#include <algorithm>
+        -:    5:#include <iostream>
+        -:    6:#include <tuple>
+        -:    7:#include <vector>
+        -:    8:
+        -:    9:using namespace std;
+        -:   10:
+        1:   11:vector<tuple<int, int, int, int>> kruskal(const vector<tuple<int, int, int, int>>& graph_edges, int n) {
+        1:   12:    UnionFind graph(n);  // מבנה נתונים לבדיקת רכיבי קשירות
+        1:   13:    vector<tuple<int, int, int, int>> edges = graph_edges;
+        1:   14:    vector<tuple<int, int, int, int>> spanning_tree;
+        -:   15:
+        -:   16:    // מיון הקשתות לפי משקל
+        1:   17:    sort(edges.begin(), edges.end(), [](const auto& a, const auto& b) {
+        8:   18:        return get<2>(a) < get<2>(b);
+        -:   19:    });
+        -:   20:
+        1:   21:    int edges_added = 0;  // סופר כמה קשתות נוספו ל-MST
+        -:   22:
+        -:   23:    // מעבר על הקשתות ובדיקת האיחוד
+        6:   24:    for (const auto& edge : edges) {
+        -:   25:        int from, to, cost, id;
+        5:   26:        tie(from, to, cost, id) = edge;
+        -:   27:
+        -:   28:        // הורדת 1 מהאינדקסים (התאמה לאינדקסים שמתחילים מ-1)
+        5:   29:        from--;
+        5:   30:        to--;
+        -:   31:
+        5:   32:        if (graph.unite(from, to)) {  
+        4:   33:            spanning_tree.emplace_back(from + 1, to + 1, cost, id);
+        4:   34:            edges_added++;
+        -:   35:        }
+        -:   36:    }
+        -:   37:
+        -:   38:    // בדיקה אם הגרף קשיר
+        1:   39:    if (edges_added < n - 1) {
+    #####:   40:        cerr << "Error: Graph is not connected, cannot find MST using Kruskal.\n";
+    #####:   41:        return {};  // החזרת רשימה ריקה אם הגרף אינו קשיר
+        -:   42:    }
+        -:   43:
+        1:   44:    cout << "Kruskal's Algorithm completed successfully! MST found.\n";
+        1:   45:    return spanning_tree;
+        1:   46:}

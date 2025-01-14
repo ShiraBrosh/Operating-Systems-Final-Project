@@ -1,0 +1,203 @@
+        -:    0:Source:mst_metrics.cpp
+        -:    0:Graph:mst_metrics.gcno
+        -:    0:Data:mst_metrics.gcda
+        -:    0:Runs:1
+        -:    1:// mst_metrics.cpp
+        -:    2:#include "mst_metrics.hpp"
+        -:    3:#include <algorithm>
+        -:    4:#include <queue>
+        -:    5:#include <set>
+        -:    6:
+        -:    7:// בקובץ mst_metrics.cpp
+        -:    8:
+        -:    9:// mst_metrics.cpp
+        2:   10:MSTResult MSTMetrics::calculateMetrics(
+        -:   11:    const std::vector<std::tuple<int, int, int>>& mst_edges, 
+        -:   12:    int vertex_count) 
+        -:   13:{
+        2:   14:    std::cout << "Starting metrics calculation...\n";
+        2:   15:    MSTResult result;
+        2:   16:    result.mst_edges = mst_edges;
+        -:   17:
+        -:   18:    try {
+        -:   19:        // 1. חישוב משקל כולל
+        2:   20:        std::cout << "Calculating total weight...\n";
+        2:   21:        result.total_weight = 0;
+       10:   22:        for (const auto& edge : mst_edges) {
+        8:   23:            result.total_weight += std::get<2>(edge);
+        -:   24:        }
+        2:   25:        std::cout << "Total weight calculated: " << result.total_weight << "\n";
+        -:   26:
+        -:   27:        // 2. בניית מטריצת מרחקים
+        2:   28:        std::cout << "Building distance matrix...\n";
+        -:   29:        auto distances = std::vector<std::vector<double>>(
+        -:   30:            vertex_count, 
+        4:   31:            std::vector<double>(vertex_count, std::numeric_limits<double>::infinity())
+        4:   32:        );
+        -:   33:
+        -:   34:        // אתחול המטריצה
+       12:   35:        for (int i = 0; i < vertex_count; i++) {
+       10:   36:            distances[i][i] = 0;  // המרחק מצומת לעצמו הוא 0
+        -:   37:        }
+        -:   38:
+        -:   39:        // הוספת הקשתות למטריצה
+       10:   40:        for (const auto& edge : mst_edges) {
+        8:   41:            int from = std::get<0>(edge) - 1;  // מתאים לאינדקס המתחיל מ-0
+        8:   42:            int to = std::get<1>(edge) - 1;
+        8:   43:            double weight = std::get<2>(edge);
+        8:   44:            distances[from][to] = weight;
+        8:   45:            distances[to][from] = weight;  // גרף לא מכוון
+        -:   46:        }
+        -:   47:
+        -:   48:        // Floyd-Warshall לחישוב כל המרחקים הקצרים
+        2:   49:        std::cout << "Computing all shortest paths...\n";
+       12:   50:        for (int k = 0; k < vertex_count; k++) {
+       60:   51:            for (int i = 0; i < vertex_count; i++) {
+      300:   52:                for (int j = 0; j < vertex_count; j++) {
+      440:   53:                    if (distances[i][k] != std::numeric_limits<double>::infinity() &&
+      190:   54:                        distances[k][j] != std::numeric_limits<double>::infinity()) {
+      158:   55:                        distances[i][j] = std::min(
+      158:   56:                            distances[i][j], 
+      316:   57:                            distances[i][k] + distances[k][j]
+        -:   58:                        );
+        -:   59:                    }
+        -:   60:                }
+        -:   61:            }
+        -:   62:        }
+        -:   63:
+        -:   64:        // 3. חישוב המדדים
+        2:   65:        std::cout << "Computing final metrics...\n";
+        2:   66:        result.longest_distance = 0;
+        2:   67:        result.shortest_distance = std::numeric_limits<double>::infinity();
+        2:   68:        double sum_distances = 0;
+        2:   69:        int count = 0;
+        -:   70:
+       12:   71:        for (int i = 0; i < vertex_count; i++) {
+       30:   72:            for (int j = i + 1; j < vertex_count; j++) {
+       20:   73:                if (distances[i][j] != std::numeric_limits<double>::infinity()) {
+       20:   74:                    result.longest_distance = std::max(result.longest_distance, distances[i][j]);
+       20:   75:                    result.shortest_distance = std::min(result.shortest_distance, distances[i][j]);
+       20:   76:                    sum_distances += distances[i][j];
+       20:   77:                    count++;
+        -:   78:                }
+        -:   79:            }
+        -:   80:        }
+        -:   81:
+       2*:   82:        result.average_distance = count > 0 ? sum_distances / count : 0;
+        -:   83:        
+        2:   84:        std::cout << "Metrics calculation completed!\n";
+        2:   85:        std::cout << "Results:\n";
+        2:   86:        std::cout << "- Total Weight: " << result.total_weight << "\n";
+        2:   87:        std::cout << "- Longest Distance: " << result.longest_distance << "\n";
+        2:   88:        std::cout << "- Shortest Distance: " << result.shortest_distance << "\n";
+        2:   89:        std::cout << "- Average Distance: " << result.average_distance << "\n";
+        -:   90:
+        4:   91:        return result;
+        -:   92:
+        2:   93:    } catch (const std::exception& e) {
+    =====:   94:        std::cerr << "Error calculating metrics: " << e.what() << "\n";
+    =====:   95:        throw;
+    =====:   96:    }
+    =====:   97:}
+        -:   98:
+    #####:   99:double MSTMetrics::calculateTotalWeight(
+        -:  100:    const std::vector<std::tuple<int, int, int>>& mst_edges) 
+        -:  101:{
+    #####:  102:    double total = 0;
+    #####:  103:    for (const auto& edge : mst_edges) {
+    #####:  104:        total += std::get<2>(edge); // הוספת המשקל של כל קשת
+        -:  105:    }
+    #####:  106:    return total;
+        -:  107:}
+        -:  108:
+    #####:  109:std::vector<std::vector<double>> MSTMetrics::buildDistanceMatrix(
+        -:  110:    const std::vector<std::tuple<int, int, int>>& mst_edges,
+        -:  111:    int vertex_count)
+        -:  112:{
+        -:  113:    // Initialize distance matrix with infinity
+        -:  114:    std::vector<std::vector<double>> dist(
+        -:  115:        vertex_count,
+    #####:  116:        std::vector<double>(vertex_count, std::numeric_limits<double>::infinity())
+    #####:  117:    );
+        -:  118:    
+        -:  119:    // Set diagonal to 0
+    #####:  120:    for (int i = 0; i < vertex_count; i++) {
+    #####:  121:        dist[i][i] = 0;
+        -:  122:    }
+        -:  123:    
+        -:  124:    // Add edges to matrix
+    #####:  125:    for (const auto& edge : mst_edges) {
+    #####:  126:        int from = std::get<0>(edge) - 1; // התאמה לאינדקס המתחיל מ-0
+    #####:  127:        int to = std::get<1>(edge) - 1;
+    #####:  128:        double weight = std::get<2>(edge);
+    #####:  129:        dist[from][to] = weight;
+    #####:  130:        dist[to][from] = weight; // גרף לא מכוון
+        -:  131:    }
+        -:  132:    
+        -:  133:    // Floyd-Warshall algorithm
+    #####:  134:    for (int k = 0; k < vertex_count; k++) {
+    #####:  135:        for (int i = 0; i < vertex_count; i++) {
+    #####:  136:            for (int j = 0; j < vertex_count; j++) {
+    #####:  137:                if (dist[i][k] != std::numeric_limits<double>::infinity() &&
+    #####:  138:                    dist[k][j] != std::numeric_limits<double>::infinity()) {
+    #####:  139:                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+        -:  140:                }
+        -:  141:            }
+        -:  142:        }
+        -:  143:    }
+        -:  144:    
+    #####:  145:    return dist;
+        -:  146:}
+        -:  147:
+    #####:  148:double MSTMetrics::calculateLongestDistance(
+        -:  149:    const std::vector<std::tuple<int, int, int>>& mst_edges,
+        -:  150:    int vertex_count)
+        -:  151:{
+    #####:  152:    auto dist = buildDistanceMatrix(mst_edges, vertex_count);
+    #####:  153:    double max_distance = 0;
+        -:  154:    
+    #####:  155:    for (int i = 0; i < vertex_count; i++) {
+    #####:  156:        for (int j = i + 1; j < vertex_count; j++) {
+    #####:  157:            if (dist[i][j] != std::numeric_limits<double>::infinity()) {
+    #####:  158:                max_distance = std::max(max_distance, dist[i][j]);
+        -:  159:            }
+        -:  160:        }
+        -:  161:    }
+        -:  162:    
+    #####:  163:    return max_distance;
+    #####:  164:}
+        -:  165:
+    #####:  166:double MSTMetrics::calculateAverageDistance(
+        -:  167:    const std::vector<std::tuple<int, int, int>>& mst_edges,
+        -:  168:    int vertex_count)
+        -:  169:{
+    #####:  170:    auto dist = buildDistanceMatrix(mst_edges, vertex_count);
+    #####:  171:    double sum = 0;
+    #####:  172:    int count = 0;
+        -:  173:    
+    #####:  174:    for (int i = 0; i < vertex_count; i++) {
+    #####:  175:        for (int j = i + 1; j < vertex_count; j++) {
+    #####:  176:            if (dist[i][j] != std::numeric_limits<double>::infinity()) {
+    #####:  177:                sum += dist[i][j];
+    #####:  178:                count++;
+        -:  179:            }
+        -:  180:        }
+        -:  181:    }
+        -:  182:    
+    #####:  183:    return count > 0 ? sum / count : 0;
+    #####:  184:}
+        -:  185:
+    #####:  186:double MSTMetrics::calculateShortestDistance(
+        -:  187:    const std::vector<std::tuple<int, int, int>>& mst_edges)
+        -:  188:{
+    #####:  189:    if (mst_edges.empty()) {
+    #####:  190:        return std::numeric_limits<double>::infinity();
+        -:  191:    }
+        -:  192:    
+    #####:  193:    double min_distance = std::numeric_limits<double>::infinity();
+    #####:  194:    for (const auto& edge : mst_edges) {
+    #####:  195:        min_distance = std::min(min_distance, static_cast<double>(std::get<2>(edge)));
+        -:  196:    }
+        -:  197:    
+    #####:  198:    return min_distance;
+        -:  199:}

@@ -1,0 +1,231 @@
+        -:    0:Source:server.cpp
+        -:    0:Graph:server.gcno
+        -:    0:Data:server.gcda
+        -:    0:Runs:1
+        -:    1:// server.cpp
+        -:    2:#include "server.hpp"
+        -:    3:#include "MSTFactory.hpp"
+        -:    4:#include <iostream>
+        -:    5:#include <algorithm>
+        -:    6:#include <sstream>
+        -:    7:#include <netinet/in.h>
+        -:    8:#include <unistd.h>
+        -:    9:#include <cstring>
+        -:   10:
+        1:   11:Server::Server() 
+        1:   12:   : vertexCount(0)
+        1:   13:   , mst_solver(std::make_unique<ActiveObject<MSTResult>>())
+        1:   14:   , metrics_calculator(std::make_unique<ActiveObject<MSTResult>>())
+        2:   15:   , thread_pool(std::make_unique<LeaderFollowerPool>(THREAD_POOL_SIZE)) {}
+        -:   16:
+        1:   17:void Server::newGraph(int vertexCount, int edgeCount) {
+        1:   18:   this->vertexCount = vertexCount;
+        1:   19:   graph.clear();
+        1:   20:   std::cout << "Created new graph with " << vertexCount << " vertices.\n";
+        1:   21:   std::cout << "Expecting " << edgeCount << " edges. Send them using: 'Addedge <from> <to> <weight>'\n";
+        1:   22:}
+        -:   23:
+        5:   24:void Server::addEdge(int from, int to, int weight) {
+        5:   25:   graph.emplace_back(from, to, weight, graph.size());
+        5:   26:   std::cout << "Edge added: " << from << " -> " << to << " (Weight: " << weight << ")\n";
+        5:   27:}
+        -:   28:
+    #####:   29:void Server::removeEdge(int from, int to) {
+    #####:   30:   graph.erase(
+    #####:   31:       std::remove_if(graph.begin(), graph.end(),
+    #####:   32:           [&](const auto& edge) { 
+    #####:   33:               return std::get<0>(edge) == from && std::get<1>(edge) == to; 
+        -:   34:           }),
+    #####:   35:       graph.end()
+        -:   36:   );
+    #####:   37:   std::cout << "Edge removed: " << from << " -> " << to << "\n";
+    #####:   38:}
+        -:   39:
+        1:   40:MSTResult Server::processMSTPipeline(const std::string& algorithm) {
+        -:   41:   // Stage 1: Find MST
+        2:   42:   auto mst_future = mst_solver->enqueue([this, algorithm]() {
+        1:   43:       MSTResult result;
+        1:   44:       auto mst = MSTFactory::solveMST(graph, vertexCount, algorithm);
+        1:   45:       std::vector<std::tuple<int, int, int>> simplified_mst;
+        5:   46:       for (const auto& edge : mst) {
+        4:   47:           simplified_mst.emplace_back(
+        4:   48:               std::get<0>(edge), 
+        4:   49:               std::get<1>(edge), 
+        4:   50:               std::get<2>(edge)
+        -:   51:           );
+        -:   52:       }
+        1:   53:       result.mst_edges = simplified_mst;
+        2:   54:       return result;
+        2:   55:   });
+        -:   56:
+        -:   57:   // Stage 2: Calculate metrics
+        2:   58:   return metrics_calculator->enqueue([this, mst = std::move(mst_future)]() mutable {
+        1:   59:       MSTResult result = mst.get();
+        1:   60:       if (result.mst_edges.empty()) {
+    #####:   61:           throw std::runtime_error("No MST edges found");
+        -:   62:       }
+        2:   63:       return MSTMetrics::calculateMetrics(result.mst_edges, this->vertexCount);
+        3:   64:   }).get();
+        1:   65:}
+        -:   66:
+        1:   67:MSTResult Server::processMSTLeaderFollower(const std::string& algorithm) {
+        1:   68:   std::shared_ptr<std::promise<MSTResult>> promise = std::make_shared<std::promise<MSTResult>>();
+        1:   69:   std::future<MSTResult> future = promise->get_future();
+        -:   70:
+        1:   71:   thread_pool->submit([this, algorithm, promise]() {
+        -:   72:       try {
+        1:   73:           auto mst = MSTFactory::solveMST(graph, vertexCount, algorithm);
+        1:   74:           std::vector<std::tuple<int, int, int>> simplified_mst;
+        5:   75:           for (const auto& edge : mst) {
+        4:   76:               simplified_mst.emplace_back(
+        4:   77:                   std::get<0>(edge), 
+        4:   78:                   std::get<1>(edge), 
+        4:   79:                   std::get<2>(edge)
+        -:   80:               );
+        -:   81:           }
+        1:   82:           auto result = MSTMetrics::calculateMetrics(simplified_mst, vertexCount);
+        1:   83:           promise->set_value(std::move(result));
+        -:   84:           
+        1:   85:       } catch (const std::exception& e) {
+    =====:   86:           promise->set_exception(std::current_exception());
+    =====:   87:       }
+        1:   88:   });
+        -:   89:
+        1:   90:   auto status = future.wait_for(std::chrono::seconds(30));
+        1:   91:   if (status == std::future_status::timeout) {
+    #####:   92:       throw std::runtime_error("Computation timed out");
+        -:   93:   }
+        -:   94:   
+        2:   95:   return future.get();
+        1:   96:}
+        -:   97:
+        2:   98:void Server::solveMST(const std::string& algorithm, bool use_pipeline) {
+        -:   99:   try {
+        2:  100:       std::cout << "\n=== MST Calculation Report ===\n";
+        2:  101:       std::cout << "Algorithm: " << algorithm << "\n";
+        2:  102:       std::cout << "Processing Method: " << (use_pipeline ? "Pipeline" : "Leader-Follower") << "\n";
+        2:  103:       std::cout << "============================\n\n";
+        -:  104:
+        2:  105:       MSTResult result;
+        2:  106:       if (use_pipeline) {
+        1:  107:           result = processMSTPipeline(algorithm);
+        -:  108:       } else {
+        1:  109:           result = processMSTLeaderFollower(algorithm);
+        -:  110:       }
+        -:  111:       
+        2:  112:       std::cout << "Measurements:\n";
+        2:  113:       std::cout << "-------------\n";
+        2:  114:       std::cout << "Total MST Weight: " << result.total_weight << "\n";
+        2:  115:       std::cout << "Longest Distance: " << result.longest_distance << "\n";
+        2:  116:       std::cout << "Average Distance: " << result.average_distance << "\n";
+        2:  117:       std::cout << "Shortest Distance: " << result.shortest_distance << "\n\n";
+        -:  118:       
+        2:  119:       std::cout << "MST Edges:\n";
+        2:  120:       std::cout << "----------\n";
+       10:  121:       for (const auto& edge : result.mst_edges) {
+        8:  122:           std::cout << "Edge " << std::get<0>(edge) << " -> " << std::get<1>(edge) 
+        8:  123:                    << " (Weight: " << std::get<2>(edge) << ")\n";
+        -:  124:       }
+        2:  125:       std::cout << "\n=== End of Report ===\n\n";
+        -:  126:
+        2:  127:   } catch (const std::exception& e) {
+    =====:  128:       std::cerr << "Error: " << e.what() << std::endl;
+    =====:  129:   }
+        2:  130:}
+        -:  131:
+        9:  132:bool Server::handleCommand(const std::string& command) {
+        9:  133:   std::stringstream ss(command);
+        9:  134:   std::string cmd;
+        9:  135:   ss >> cmd;
+        -:  136:
+        9:  137:   if (cmd=="QUIT"){
+        1:  138:       return true; // חיווי לסגירת השרת
+        -:  139:   }
+        -:  140:
+        8:  141:   if (cmd == "Newgraph") {
+        -:  142:       int n, m;
+        1:  143:       ss >> n >> m;
+        1:  144:       newGraph(n, m);
+        7:  145:   } else if (cmd == "Addedge") {
+        -:  146:       int from, to, weight;
+        5:  147:       ss >> from >> to >> weight;
+        5:  148:       addEdge(from, to, weight);
+        2:  149:   } else if (cmd == "Removeedge") {
+        -:  150:       int from, to;
+    #####:  151:       ss >> from >> to;
+    #####:  152:       removeEdge(from, to);
+        2:  153:   } else if (cmd == "Solve") {
+        2:  154:       std::string algo, method;
+        2:  155:       ss >> algo >> method;
+        2:  156:       bool use_pipeline = (method != "leader");
+        2:  157:       solveMST(algo, use_pipeline);
+        2:  158:   } else {
+    #####:  159:       std::cout << "Unknown command: " << command << std::endl;
+        -:  160:   }
+        -:  161:
+        8:  162:    return false; // המשך פעילות השרת
+        -:  163:
+        9:  164:}
+        -:  165:
+        1:  166:void Server::startServer() {
+        1:  167:   int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+        1:  168:   if (server_fd < 0) {
+    #####:  169:       throw std::runtime_error("Failed to create socket");
+        -:  170:   }
+        -:  171:
+        1:  172:   int opt = 1;
+        1:  173:   setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+        -:  174:
+        -:  175:   struct sockaddr_in address;
+        1:  176:   address.sin_family = AF_INET;
+        1:  177:   address.sin_addr.s_addr = INADDR_ANY;
+        1:  178:   address.sin_port = htons(8080);
+        -:  179:
+        1:  180:   if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+    #####:  181:       close(server_fd);
+    #####:  182:       throw std::runtime_error("Bind failed");
+        -:  183:   }
+        -:  184:
+        1:  185:   if (listen(server_fd, 3) < 0) {
+    #####:  186:       close(server_fd);
+    #####:  187:       throw std::runtime_error("Listen failed");
+        -:  188:   }
+        -:  189:
+        1:  190:   std::cout << "Server is listening on port 8080...\n";
+        -:  191:
+        -:  192:   while (true) {
+        1:  193:       int addrlen = sizeof(address);
+        1:  194:       int new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
+       1*:  195:       if (new_socket < 0) {
+    #####:  196:           std::cerr << "Accept failed\n";
+    #####:  197:           continue;
+        -:  198:       }
+        -:  199:
+        1:  200:       std::cout << "Client connected. Ready to receive commands.\n";
+        -:  201:       
+        1:  202:       char buffer[1024] = {0};
+        -:  203:       while (true) {
+        9:  204:           int bytesRead = read(new_socket, buffer, 1024);
+        9:  205:           if (bytesRead <= 0) {
+    #####:  206:               std::cout << "Client disconnected.\n";
+    #####:  207:               break;
+        -:  208:           }
+        -:  209:
+        9:  210:           std::string receivedCommand(buffer);
+        9:  211:           bool shouldQuit = handleCommand(receivedCommand);
+        9:  212:           send(new_socket, "Command received\n", 17, 0);
+        9:  213:           memset(buffer, 0, sizeof(buffer));
+        -:  214:
+        9:  215:           if (shouldQuit) {
+        1:  216:               std::cout << "Shutting down server...\n";
+        1:  217:               close(new_socket);
+        1:  218:               close(server_fd);
+        1:  219:               return; // סגור את השרת
+        -:  220:           }
+       17:  221:       }
+        -:  222:       
+    #####:  223:       close(new_socket);
+    #####:  224:   }
+        -:  225:   
+        -:  226:   close(server_fd);
+        -:  227:}

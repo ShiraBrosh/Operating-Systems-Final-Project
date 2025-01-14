@@ -1,0 +1,87 @@
+/*
+==========================================
+          HOW TO RUN
+==========================================
+
+gcov mst_metrics.gcda > mst_metrics_gcov.txt
+*/
+
+
+
+File 'mst_metrics.cpp'
+Lines executed:48.08% of 104
+Creating 'mst_metrics.cpp.gcov'
+
+File '/usr/include/c++/11/iostream'
+No executable lines
+Removing 'iostream.gcov'
+
+File '/usr/include/c++/11/bits/stl_algobase.h'
+Lines executed:80.00% of 50
+Creating 'stl_algobase.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator.h'
+Lines executed:35.29% of 17
+Creating 'stl_iterator.h.gcov'
+
+File '/usr/include/c++/11/bits/cpp_type_traits.h'
+Lines executed:100.00% of 2
+Creating 'cpp_type_traits.h.gcov'
+
+File '/usr/include/c++/11/tuple'
+Lines executed:0.00% of 23
+Creating 'tuple.gcov'
+
+File '/usr/include/c++/11/bits/stl_uninitialized.h'
+Lines executed:70.37% of 27
+Creating 'stl_uninitialized.h.gcov'
+
+File '/usr/include/c++/11/bits/alloc_traits.h'
+Lines executed:84.62% of 13
+Creating 'alloc_traits.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_vector.h'
+Lines executed:66.30% of 92
+Creating 'stl_vector.h.gcov'
+
+File '/usr/include/c++/11/ext/alloc_traits.h'
+Lines executed:33.33% of 6
+Creating 'alloc_traits.h.gcov'
+
+File '/usr/include/c++/11/bits/move.h'
+Lines executed:100.00% of 4
+Creating 'move.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_iterator_base_types.h'
+Lines executed:100.00% of 2
+Creating 'stl_iterator_base_types.h.gcov'
+
+File '/usr/include/c++/11/bits/stl_construct.h'
+Lines executed:100.00% of 14
+Creating 'stl_construct.h.gcov'
+
+File '/usr/include/c++/11/ext/new_allocator.h'
+Lines executed:80.00% of 15
+Creating 'new_allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/allocator.h'
+Lines executed:66.67% of 6
+Creating 'allocator.h.gcov'
+
+File '/usr/include/c++/11/bits/vector.tcc'
+Lines executed:0.00% of 33
+Creating 'vector.tcc.gcov'
+
+File 'mst_metrics.hpp'
+Lines executed:0.00% of 5
+Creating 'mst_metrics.hpp.gcov'
+
+File '/usr/include/c++/11/limits'
+Lines executed:0.00% of 1
+Creating 'limits.gcov'
+
+File '/usr/include/c++/11/new'
+Lines executed:0.00% of 3
+Creating 'new.gcov'
+
+Lines executed:54.44% of 417

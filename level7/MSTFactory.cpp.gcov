@@ -1,0 +1,30 @@
+        -:    0:Source:MSTFactory.cpp
+        -:    0:Graph:MSTFactory.gcno
+        -:    0:Data:MSTFactory.gcda
+        -:    0:Runs:1
+        -:    1:#include "MSTFactory.hpp"
+        -:    2:#include "kruskal.hpp"
+        -:    3:#include "prim.hpp"
+        -:    4:#include <iostream>
+        -:    5:
+        -:    6:using namespace std;
+        -:    7:
+        -:    8:// Factory method for solving the MST using chosen algorithm
+        2:    9:vector<tuple<int, int, int, int>> MSTFactory::solveMST(
+        -:   10:    const vector<tuple<int, int, int, int>>& edges, 
+        -:   11:    int vertexCount, 
+        -:   12:    const string& algorithm) 
+        -:   13:{
+        2:   14:    if (algorithm == "kruskal") {
+        1:   15:        cout << "Solving MST using Kruskal's algorithm..." << endl;
+        1:   16:        return kruskal(edges, vertexCount);
+        -:   17:    } 
+        1:   18:    else if (algorithm == "prim") {
+        1:   19:        cout << "Solving MST using Prim's algorithm..." << endl;
+        1:   20:        return prim(edges, vertexCount);
+        -:   21:    } 
+        -:   22:    else {
+    #####:   23:        cerr << "Error: Unknown algorithm requested: " << algorithm << endl;
+    #####:   24:        return {};
+        -:   25:    }
+        -:   26:}

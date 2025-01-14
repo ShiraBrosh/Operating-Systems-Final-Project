@@ -1,0 +1,75 @@
+        -:    0:Source:main.cpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:main.gcda
+        -:    0:Runs:1
+        -:    1:#include "server.hpp"
+        -:    2:
+        1:    3:int main() {
+        1:    4:    Server server;
+        1:    5:    server.startServer();
+        1:    6:    return 0;
+        1:    7:}
+        -:    8:
+        -:    9:
+        -:   10:/*
+        -:   11:==========================================
+        -:   12:          HOW TO RUN - MST SERVER
+        -:   13:==========================================
+        -:   14:This guide explains how to compile, run, and test the MST server 
+        -:   15:that uses the Leader-Follower pattern and Pipeline pattern 
+        -:   16:for solving Minimum Spanning Tree (MST) problems.
+        -:   17:
+        -:   18:📦 Project Structure:
+        -:   19:- `server_test`: Main executable for running the server.
+        -:   20:- `server.cpp / server.hpp`: Server implementation.
+        -:   21:- `kruskal.cpp / prim.cpp`: MST algorithms.
+        -:   22:- `leader_follower.cpp / leader_follower.hpp`: Leader-Follower thread pool.
+        -:   23:- `active_object.cpp / active_object.hpp`: Active Object implementation.
+        -:   24:- `mst_metrics.cpp / mst_metrics.hpp`: MST metrics calculation.
+        -:   25:- `Makefile`: Automates compilation and testing.
+        -:   26:
+        -:   27:🛠️ Step 1: Compile the Project
+        -:   28:Run the following commands in the terminal:
+        -:   29:    $ make clean
+        -:   30:    $ make
+        -:   31:
+        -:   32:🖥️ Step 2: Run the Server
+        -:   33:Launch the server on port 8080:
+        -:   34:    $ ./server_test
+        -:   35:
+        -:   36:🔗 Step 3: Connect a Client (Using Telnet)
+        -:   37:Open a second terminal and connect using telnet:
+        -:   38:    $ telnet localhost 8080
+        -:   39:
+        -:   40:📡 Step 4: Send Commands to the Server
+        -:   41:- Create a new graph:
+        -:   42:    Newgraph <number_of_vertices> <number_of_edges>
+        -:   43:- Add edges to the graph (one per line):
+        -:   44:    Addedge <from> <to> <weight>
+        -:   45:- Solve using Prim's algorithm:
+        -:   46:    Solve prim pipeline
+        -:   47:- Solve using Kruskal's algorithm:
+        -:   48:    Solve kruskal leader
+        -:   49:
+        -:   50:📊 Example Session:
+        -:   51:1. Newgraph 5 5
+        -:   52:2. Addedge 1 2 4
+        -:   53:3. Addedge 2 3 5
+        -:   54:4. Addedge 3 4 6
+        -:   55:5. Addedge 4 5 7
+        -:   56:6. Addedge 5 1 8
+        -:   57:7. Solve prim pipeline
+        -:   58:8. Solve kruskal leader
+        -:   59:
+        -:   60:✅ Expected Output:
+        -:   61:- If the graph is connected, the MST will be printed with its edges.
+        -:   62:- If the graph is not connected, an error message will be shown.
+        -:   63:
+        -:   64:🧪 Step 5: Run Tests and Valgrind
+        -:   65:- Run Valgrind memory check:
+        -:   66:    $ make memcheck
+        -:   67:- Run Valgrind thread check:
+        -:   68:    $ make helgrind
+        -:   69:
+        -:   70:==========================================
+        -:   71:*/

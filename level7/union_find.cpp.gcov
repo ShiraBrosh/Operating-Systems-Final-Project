@@ -1,0 +1,31 @@
+        -:    0:Source:union_find.cpp
+        -:    0:Graph:union_find.gcno
+        -:    0:Data:union_find.gcda
+        -:    0:Runs:1
+        -:    1:// union_find.cpp
+        -:    2:#include "union_find.hpp"
+        -:    3:#include <numeric>
+        -:    4:
+        1:    5:UnionFind::UnionFind(int _n) : n(_n), parent(_n), rank(_n, 1) {
+        1:    6:    iota(parent.begin(), parent.end(), 0);
+        1:    7:}
+        -:    8:
+        -:    9:
+       14:   10:int UnionFind::find_parent(int node) {
+       14:   11:    if (parent[node] != node)
+        4:   12:        parent[node] = find_parent(parent[node]);  // דחיסת נתיב
+       14:   13:    return parent[node];
+        -:   14:}
+        -:   15:
+        5:   16:bool UnionFind::unite(int x, int y) {
+        5:   17:    x = find_parent(x);
+        5:   18:    y = find_parent(y);
+        5:   19:    if (x == y) return false;
+        4:   20:    if (rank[x] < rank[y]) {
+    #####:   21:        parent[x] = y;
+        -:   22:    } else {
+        4:   23:        parent[y] = x;
+        4:   24:        if (rank[x] == rank[y]) rank[x]++;
+        -:   25:    }
+        4:   26:    return true;
+        -:   27:}

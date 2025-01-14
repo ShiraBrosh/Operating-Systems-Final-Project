@@ -1,0 +1,130 @@
+        -:    0:Source:leader_follower.cpp
+        -:    0:Graph:leader_follower.gcno
+        -:    0:Data:leader_follower.gcda
+        -:    0:Runs:1
+        -:    1:// leader_follower.cpp
+        -:    2:#include "leader_follower.hpp"
+        -:    3:#include <iostream>
+        -:    4:#include <stdexcept>
+        -:    5:
+        1:    6:LeaderFollowerPool::LeaderFollowerPool(size_t num_threads)
+        1:    7:    : running(true)
+        1:    8:    , leader_count(0)
+        1:    9:    , thread_count(num_threads) {
+        -:   10:    
+        1:   11:    if (num_threads == 0) {
+    #####:   12:        throw std::invalid_argument("Thread count must be greater than 0");
+        -:   13:    }
+        -:   14:
+        5:   15:    for (size_t i = 0; i < num_threads; ++i) {
+        4:   16:        auto worker = std::make_unique<Worker>();
+        8:   17:        worker->thread = std::thread([this, w = worker.get()]() {
+        4:   18:            worker_loop(w);
+        4:   19:        });
+        4:   20:        workers.push_back(std::move(worker));
+        4:   21:    }
+        -:   22:
+        1:   23:    promote_new_leader();
+        1:   24:}
+        -:   25:
+        1:   26:LeaderFollowerPool::~LeaderFollowerPool() {
+        1:   27:    shutdown();
+        1:   28:}
+        -:   29:
+        1:   30:void LeaderFollowerPool::shutdown() {
+        -:   31:    {
+        1:   32:        std::lock_guard<std::mutex> lock(pool_mutex);
+        1:   33:        running = false;
+        1:   34:    }
+        1:   35:    pool_cv.notify_all();
+        5:   36:    for (auto& worker : workers) {
+        4:   37:        worker->cv.notify_one();
+        -:   38:    }
+        -:   39:
+        5:   40:    for (auto& worker : workers) {
+        4:   41:        if (worker->thread.joinable()) {
+        4:   42:            worker->thread.join();
+        -:   43:        }
+        -:   44:    }
+        -:   45:
+        1:   46:    std::queue<std::function<void()>> empty;
+        1:   47:    std::swap(tasks, empty);
+        1:   48:}
+        -:   49:
+        1:   50:void LeaderFollowerPool::submit(std::function<void()> task) {
+        -:   51:    {
+        1:   52:        std::lock_guard<std::mutex> lock(pool_mutex);
+        1:   53:        if (!running) {
+    #####:   54:            throw std::runtime_error("Thread pool is shutting down");
+        -:   55:        }
+        1:   56:        tasks.push(std::move(task));
+        1:   57:    }
+        1:   58:    pool_cv.notify_one();
+        1:   59:}
+        -:   60:
+        2:   61:void LeaderFollowerPool::promote_new_leader() {
+        3:   62:    for (auto& worker : workers) {
+        3:   63:        if (!worker->is_leader && !worker->processing) {
+        2:   64:            worker->is_leader = true;
+        2:   65:            leader_count++;
+        2:   66:            worker->cv.notify_one();
+        2:   67:            return;
+        -:   68:        }
+        -:   69:    }
+        -:   70:}
+        -:   71:
+        4:   72:void LeaderFollowerPool::worker_loop(Worker* worker) {
+        5:   73:    while (running) {
+        5:   74:        std::unique_lock<std::mutex> lock(pool_mutex);
+        -:   75:        
+       10:   76:        while (!worker->is_leader && running) {
+        5:   77:            worker->cv.wait(lock);
+        -:   78:        }
+        -:   79:
+        5:   80:        if (!running) return;
+        -:   81:        
+        4:   82:        while (tasks.empty() && running) {
+        2:   83:            pool_cv.wait(lock);
+        -:   84:        }
+        -:   85:
+        2:   86:        if (!running) return;
+        -:   87:
+        1:   88:        auto task = std::move(tasks.front());
+        1:   89:        tasks.pop();
+        -:   90:
+        1:   91:        worker->is_leader = false;
+        1:   92:        worker->processing = true;
+        1:   93:        leader_count--;
+        1:   94:        promote_new_leader();
+        -:   95:
+        1:   96:        lock.unlock();
+        -:   97:        try {
+        1:   98:            task();
+    =====:   99:        } catch (const std::exception& e) {
+    =====:  100:            std::cerr << "Error in task execution: " << e.what() << std::endl;
+    =====:  101:        }
+        -:  102:
+        1:  103:        lock.lock();
+        1:  104:        worker->processing = false;
+        -:  105:
+        1:  106:        if (leader_count == 0) {
+    #####:  107:            worker->is_leader = true;
+    #####:  108:            leader_count++;
+        -:  109:        }
+        5:  110:    }
+        -:  111:}
+        -:  112:
+    #####:  113:size_t LeaderFollowerPool::get_pending_tasks() const {
+    #####:  114:    std::lock_guard<std::mutex> lock(pool_mutex);
+    #####:  115:    return tasks.size();
+    #####:  116:}
+        -:  117:
+    #####:  118:bool LeaderFollowerPool::has_active_tasks() const {
+    #####:  119:    std::lock_guard<std::mutex> lock(pool_mutex);
+    #####:  120:    for (const auto& worker : workers) {
+    #####:  121:        if (worker->processing) {
+    #####:  122:            return true;
+        -:  123:        }
+        -:  124:    }
+    #####:  125:    return !tasks.empty();
+    #####:  126:}
