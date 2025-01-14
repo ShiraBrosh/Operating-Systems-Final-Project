@@ -1,0 +1,97 @@
+Server is listening on port 8080...
+Client connected. Ready to receive commands.
+Unknown command: The output from Valgrind's Helgrind tool shows that there is a possible data race in your program. Here's a summary of the issue:
+
+
+Unknown command: 1. **Threads Involved**: 
+   - **Thread #1**: The main thread.
+
+Unknown command:    - **Thread #4**: A worker thread that was created by `std::thread`.
+
+2. **Data Race**:
+
+Unknown command:    - The data race occurs during the write operation at address `0x4DE6B58` by **Thread #1**. This conflicts with a previous read of the same memory location by **Thread #4**.
+
+Unknown command:    - The write operation happens inside the `promote_new_leader()` function, and the read happens inside the `worker_loop()` function.
+
+Unknown command: 
+
+Unknown command: 3. **Mutex Issue**:
+
+Unknown command:    - There is a mutex at address `0x4DE67E8`, which is held by **Thread #4** during the read. However, **Thread #1** performs the write without holding the mutex, causing the data race.
+
+Unknown command: 
+4. **Memory Allocation**:
+   - The memory at `0x4DE6B58` was allocated for a `LeaderFollowerPool::Worker` object.
+
+Unknown command:    - The mutex was allocated at `0x4DE67E8` as part of the same memory block.
+
+Unknown command: 
+
+Unknown command: ### Suggested Fixes:
+
+Unknown command: 
+
+Unknown command: - **Locking the Mutex**: Ensure that both the write (in `promote_new_leader()`) and the read (in `worker_loop()`) are protected by the mutex. The mutex should be locked before accessing shared data to prevent concurrent access.
+
+Unknown command:   
+
+Unknown command: - **Verify Mutex Usage**: Double-check the logic where the mutex is being locked and unlocked. The lock must be held when accessing shared data, and the unlocking should occur after the operation is complete.
+
+Unknown command: 
+### Further Steps:
+
+Unknown command: 1. Check if the mutex is correctly used in both functions (`promote_new_leader()` and `worker_loop()`).
+
+Unknown command: 2. Ensure that all access to shared resources (such as the `LeaderFollowerPool::Worker` object) is properly synchronized.
+
+Unknown command: 3. Run the program again with Helgrind after making these changes to verify that the data race has been resolved.
+
+Unknown command: 
+
+Client disconnected.
+Client connected. Ready to receive commands.
+Created new graph with 5 vertices.
+Expecting 5 edges. Send them using: 'Addedge <from> <to> <weight>'
+Edge added: 1 -> 2 (Weight: 4)
+Edge added: 2 -> 3 (Weight: 5)
+Edge added: 3 -> 4 (Weight: 6)
+Edge added: 4 -> 5 (Weight: 7)
+Edge added: 5 -> 1 (Weight: 8)
+
+=== MST Calculation Report ===
+Algorithm: kruskal
+Processing Method: Leader-Follower
+============================
+
+Solving MST using Kruskal's algorithm...
+Kruskal's Algorithm completed successfully! MST found.
+Starting metrics calculation...
+Calculating total weight...
+Total weight calculated: 22
+Building distance matrix...
+Computing all shortest paths...
+Computing final metrics...
+Metrics calculation completed!
+Results:
+- Total Weight: 22
+- Longest Distance: 22
+- Shortest Distance: 4
+- Average Distance: 11
+Measurements:
+-------------
+Total MST Weight: 22
+Longest Distance: 22
+Average Distance: 11
+Shortest Distance: 4
+
+MST Edges:
+----------
+Edge 1 -> 2 (Weight: 4)
+Edge 2 -> 3 (Weight: 5)
+Edge 3 -> 4 (Weight: 6)
+Edge 4 -> 5 (Weight: 7)
+
+=== End of Report ===
+
+Shutting down server...

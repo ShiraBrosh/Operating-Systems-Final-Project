@@ -1,0 +1,115 @@
+/*
+    ==========================================
+    THE COMMANDS THAT RUN
+    ==========================================
+   
+    valgrind --tool=callgrind ./server_test > callgrind.txt
+    
+    1. Newgraph 5 5
+    2. Addedge 1 2 4
+    3. Addedge 2 3 5
+    4. Addedge 3 4 6
+    5. Addedge 4 5 7
+    6. Addedge 5 1 8
+    7. Solve prim pipeline
+    8. Solve kruskal leader
+*/
+
+==12335== Callgrind, a call-graph generating cache profiler
+==12335== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==12335== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==12335== Command: ./server_test
+Server is listening on port 8080...
+Client connected. Ready to receive commands.
+Created new graph with 5 vertices.
+Expecting 5 edges. Send them using: 'Addedge <from> <to> <weight>'
+Edge added: 1 -> 2 (Weight: 4)
+Edge added: 2 -> 3 (Weight: 5)
+Edge added: 3 -> 4 (Weight: 6)
+Edge added: 4 -> 5 (Weight: 7)
+Edge added: 5 -> 1 (Weight: 8)
+
+=== MST Calculation Report ===
+Algorithm: prim
+Processing Method: Pipeline
+============================
+
+Solving MST using Prim's algorithm...
+Starting Prim's Algorithm with 1-based indexing support...
+MST Edge Added: 1 -> 2 (Weight: 4)
+MST Edge Added: 2 -> 3 (Weight: 5)
+MST Edge Added: 3 -> 4 (Weight: 6)
+MST Edge Added: 4 -> 5 (Weight: 7)
+Prim's Algorithm completed successfully!
+Starting metrics calculation...
+Calculating total weight...
+Total weight calculated: 22
+Building distance matrix...
+Computing all shortest paths...
+Computing final metrics...
+Metrics calculation completed!
+Results:
+- Total Weight: 22
+- Longest Distance: 22
+- Shortest Distance: 4
+- Average Distance: 11
+Measurements:
+-------------
+Total MST Weight: 22
+Longest Distance: 22
+Average Distance: 11
+Shortest Distance: 4
+
+MST Edges:
+----------
+Edge 1 -> 2 (Weight: 4)
+Edge 2 -> 3 (Weight: 5)
+Edge 3 -> 4 (Weight: 6)
+Edge 4 -> 5 (Weight: 7)
+
+=== End of Report ===
+
+
+=== MST Calculation Report ===
+Algorithm: kruskal
+Processing Method: Leader-Follower
+============================
+
+Solving MST using Kruskal's algorithm...
+Kruskal's Algorithm completed successfully! MST found.
+Starting metrics calculation...
+Calculating total weight...
+Total weight calculated: 22
+Building distance matrix...
+Computing all shortest paths...
+Computing final metrics...
+Metrics calculation completed!
+Results:
+- Total Weight: 22
+- Longest Distance: 22
+- Shortest Distance: 4
+- Average Distance: 11
+Measurements:
+-------------
+Total MST Weight: 22
+Longest Distance: 22
+Average Distance: 11
+Shortest Distance: 4
+
+MST Edges:
+----------
+Edge 1 -> 2 (Weight: 4)
+Edge 2 -> 3 (Weight: 5)
+Edge 3 -> 4 (Weight: 6)
+Edge 4 -> 5 (Weight: 7)
+
+=== End of Report ===
+
+Shutting down server...
+==12335== 
+==12335== For interactive control, run 'callgrind_control -h'.
+==12335== 
+==12335== Events    : Ir
+==12335== Collected : 2883107
+==12335== 
+==12335== I   refs:      2,883,107
