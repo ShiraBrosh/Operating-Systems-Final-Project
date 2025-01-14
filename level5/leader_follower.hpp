@@ -39,7 +39,6 @@ public:
     explicit LeaderFollowerPool(size_t num_threads);
     ~LeaderFollowerPool();
 
-    // Delete copy constructor and assignment operator
     LeaderFollowerPool(const LeaderFollowerPool&) = delete;
     LeaderFollowerPool& operator=(const LeaderFollowerPool&) = delete;
 
